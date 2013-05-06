@@ -1,6 +1,20 @@
 <?php
 require_once "mainframe/autoload.php";
 @session_start();
+
+$curso = 128;
+$forum = 470;
+
+$dbm = new datamining();
+//echo '<pre>';
+//print_r($dbm->getProfessroesCurso($curso));                                                
+$alunos = $dbm->getAlunosCurso($curso);
+//print_r($dbm->getModId($curso, $forum));
+$org = $dbm->getOrganizacao($curso, $forum);
+$flu = $dbm->getFluenciaDigital($curso, $forum);
+$auto = $dbm->getAutonomia($curso, $forum);
+$com = $dbm->getComunicacao($curso, $forum);
+$virt = $dbm->getPresencialidadeVirtual($curso, $forum);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -41,20 +55,9 @@ require_once "mainframe/autoload.php";
                 <div class="row-fluid" style="background: url('/alo/img/fundo.png') repeat-x scroll center top #E8ECD8">
                         <div class="center">
                                 <div class="content span" style="display:block;">
-                                        <?php
-                                        $dbm = new datamining();
-                                        //echo '<pre>';
-                                        //print_r($dbm->getProfessroesCurso(128));                                                
-                                        $alunos = $dbm->getAlunosCurso(128);
-                                        //print_r($dbm->getDiasForum(470));                                                
-                                        //print_r($dbm->getModId(128, 470));
-                                        $org = $dbm->getOrganizacao(128, 470);
-                                        $flu = $dbm->getFluenciaDigital(128, 470);
-                                        $auto = $dbm->getAutonomia(128, 470);
-                                        $com = $dbm->getComunicacao(128, 470);
-                                        $virt = $dbm->getPresencialidadeVirtual(128, 470);
-                                        ?>
-                                        <h4>Total de Alunos - <?= count($alunos) ?></h4>
+                                        <h5>Curso - <?= utf8_encode($dbm->getDadoCurso($curso)->Fields("fullname")) ?></h5>
+                                        <h5>Fórum - <?= utf8_encode($dbm->getDadoForum($forum)->Fields("name")) ?></h5>
+                                        <h6>Total de Alunos - <?= count($alunos) ?> / Dia(s) de Fórum - <?= $dbm->getDiasForum($forum) ?></h6>
                                         <table class="table table-striped" id='tblData'>
                                                 <thead>
                                                         <tr>

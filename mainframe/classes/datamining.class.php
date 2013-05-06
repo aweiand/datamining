@@ -105,6 +105,14 @@ class datamining extends utils {
                 return $aluno;
         }
 
+        function getDadoForum($forum){
+                return $this->db->query("SELECT * FROM ".$this->prefix."forum WHERE id = $forum");
+        }
+        
+        function getDadoCurso($course){
+                return $this->db->query("SELECT * FROM ".$this->prefix."course WHERE id = $course");
+        }
+        
         /**
          * Função que realiza filtros para saber se o aluno tem a competencia organização
          * baseado nas datas iniciais e finais do fórum
