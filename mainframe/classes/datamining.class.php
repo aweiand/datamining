@@ -105,9 +105,19 @@ class datamining extends utils {
                 return $aluno;
         }
 
+        /**
+         * Função que realiza filtros para saber se o aluno tem a competencia organização
+         * baseado nas datas iniciais e finais do fórum
+         * @param type $curso
+         * @param type $idforum
+         * @return string|boolean
+         */
         function getOrganizacao($curso, $idforum) {
                 $alunos = $this->getAlunosCurso($curso);
-                $org = array();
+
+                foreach ($alunos as $key => $data) {
+                        $alunos[$key] = 0;
+                }
 
                 $forum = $this->db->query("SELECT * FROM " . $this->prefix . "forum
                                                                         WHERE id = $idforum");
@@ -125,22 +135,36 @@ class datamining extends utils {
                                                                                 GROUP BY p.userid");
 
                         while (!$post->EOF) {
-                                if ($post->Fields("modif") < $forum->Fields("assesstimefinish") && $post->Fields("modif") > $forum->Fields("assesstimestart")) {
-                                        if ($this->dataDif(date("d-m-Y", $post->Fields("modif")), date("d-m-Y", $forum->Fields("assesstimefinish"), "d")) < 4)
-                                                $org[$post->Fields("userid")]["org"]++;
+                                if ($post->Fields("modif") < $forum->Fields("assesstimefinish") &&
+                                        $post->Fields("modif") > $forum->Fields("assesstimestart")) {
+                                        if ($this->dataDif(
+                                                        date("Y-m-d", $forum->Fields("assesstimefinish")), date("Y-m-d", $post->Fields("modif")), "d") < 4)
+                                                $alunos[$post->Fields("userid")]++;
                                         else
-                                                $org[$post->Fields("userid")]["org"]--;
+                                                $alunos[$post->Fields("userid")]--;
                                 }
+                                /*
+                                 * Debug
+                                  echo $this->dataDif(
+                                  date("d-m-Y", $forum->Fields("assesstimestart")),
+                                  date("d-m-Y", $post->Fields("modif")), "d")." ".
+                                  date("Y-m-d", $forum->Fields("assesstimestart"))." ".date("Y-m-d", $post->Fields("modif"))."<br>";
+                                 */
+
                                 $post->MoveNext();
                         }
 
                         $discus->MoveNext();
                 }
-                /*
-                 * PAssar um por um vendo se é positivo tem, se nao nao tem
-                 */
 
-                return $org;
+                foreach ($alunos as $key => $data) {
+                        if ($alunos[$key] <= 0)
+                                $alunos[$key] = false;
+                        else
+                                $alunos[$key] = true;
+                }
+
+                return $alunos;
         }
 
         /**
@@ -157,6 +181,16 @@ class datamining extends utils {
                                 WHERE 
                                         cm.course = $course AND m.id = $forum";
                 return $this->db->query($qry)->Fields("modid");
+        }
+        
+        function getDiasForum($forum){
+                $forum = $this->db->query("SELECT * FROM " . $this->prefix . "forum WHERE id = $forum");
+
+                //DEBUG::
+                //echo date("Y-m-d", $forum->Fields("assesstimestart"))." ".date("Y-m-d", $forum->Fields("assesstimefinish"))."<br />";
+                
+                return $this->dataDif(date("Y-m-d", $forum->Fields("assesstimestart")),
+                                                        date("Y-m-d", $forum->Fields("assesstimefinish")), "d");
         }
 
         /**
@@ -175,7 +209,7 @@ class datamining extends utils {
                                                         course = $course AND 
                                                         cmid = " . $this->getModId($course, $forum) . "
                                                         AND userid = $key");
-                        if ($rs->Fields("count") >= 7)
+                        if ($rs->Fields("count") >= $this->getDiasForum($forum))
                                 $alunos[$data] = true;
                         else
                                 $alunos[$data] = false;
@@ -183,8 +217,52 @@ class datamining extends utils {
                 return $alunos;
         }
 
+        /**
+         * Função para verificar se o aluno conversa mais com os professores
+         * do que com os colegas
+         * @param type $course
+         * @param type $forum
+         * @return boolean
+         */
         function getAutonomia($course, $forum) {
-                
+                $alunos = $this->getAlunosCurso($course);
+                $profs = $this->getProfessroesCurso($course);
+
+                foreach ($alunos as $key => $data) {
+                        $alunos[$key] = 0;
+                }
+
+                $discus = $this->db->query("SELECT * FROM " . $this->prefix . "forum_discussions
+                                                                        WHERE forum = $forum");
+
+                while (!$discus->EOF) {
+                        foreach ($alunos as $key => $data) {
+                                $post = $this->db->query("SELECT p.userid, p.parent
+                                                                                FROM " . $this->prefix . "forum_posts p
+                                                                        WHERE p.discussion = " . $discus->Fields("id") . "
+                                                                                AND p.userid = $key");
+
+                                while (!$post->EOF) {
+                                        $ehprof = $this->db->query("SELECT p.userid FROM " . $this->prefix . "forum_posts p
+                                                                                                WHERE p.parent = " . $post->Fields("parent"))->Fields("userid");
+                                        if (in_array($ehprof, $profs))
+                                                $alunos[$post->Fields("userid")]--;
+                                        else
+                                                $alunos[$post->Fields("userid")]++;
+                                        $post->MoveNext();
+                                }
+                        }
+                        $discus->MoveNext();
+                }
+
+                foreach ($alunos as $key => $data) {
+                        if ($alunos[$key] <= 0)
+                                $alunos[$key] = false;
+                        else
+                                $alunos[$key] = true;
+                }
+
+                return $alunos;
         }
 
         /**
@@ -195,8 +273,8 @@ class datamining extends utils {
          */
         function getComunicacao($course, $forum) {
                 $alunos = $this->getAlunosCurso($course);
-                
-                foreach ($alunos as $key => $data){
+
+                foreach ($alunos as $key => $data) {
                         $alunos[$key] = 0;
                 }
 
@@ -216,7 +294,7 @@ class datamining extends utils {
                 }
 
                 foreach ($alunos as $key => $data) {
-                        if ($data > 7)
+                        if ($data > $this->getDiasForum($forum))
                                 $alunos[$key] = true;
                         else
                                 $alunos[$key] = false;
@@ -240,7 +318,7 @@ class datamining extends utils {
                                                                 WHERE course = $course
                                                                 AND cmid = " . $this->getModId($course, $forum) . "
                                                                 AND userid = $data");
-                        if ($rs->Fields("count") > 7)
+                        if ($rs->Fields("count") > $this->getDiasForum($forum))
                                 $alunos[$data] = true;
                         else
                                 $alunos[$data] = false;

@@ -174,3 +174,18 @@ function verificaEmail(sEmail) {
                 return true;
         }
 }
+
+function shorTable(tbl) {
+        $(tbl).dataTable({
+                "bPaginate": true,
+                "bLengthChange": true,
+                "bFilter": false,
+                "bSort": true,
+                "bInfo": false,
+                "bAutoWidth": true,
+                "bJQueryUI": false,
+                "oLanguage": {
+                        "sUrl": "mainframe/plugins/jquery/DataTables-1.9.4/datatables.Portuguese.txt"
+                }
+        });
+}      
