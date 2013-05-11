@@ -326,7 +326,7 @@ class datamining extends utils {
                                                                 WHERE course = $course
                                                                 AND cmid = " . $this->getModId($course, $forum) . "
                                                                 AND userid = $data");
-                        if ($rs->Fields("count") > $this->getDiasForum($forum))
+                        if ($rs->Fields("count") > ($this->getDiasForum($forum) * 0.75) )
                                 $alunos[$data] = true;
                         else
                                 $alunos[$data] = false;
