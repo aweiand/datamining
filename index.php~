@@ -61,7 +61,7 @@ $virt = $dbm->getPresencialidadeVirtual($curso, $forum);
                                         <table class="table table-striped" id='tblData'>
                                                 <thead>
                                                         <tr>
-                                                                <th width="170">
+                                                                <th>
                                                                         Aluno
                                                                 </th>
                                                                 <th>
@@ -92,73 +92,51 @@ $virt = $dbm->getPresencialidadeVirtual($curso, $forum);
                                                                                         <td>
                                                                         $key
                                                                         </td>";
-                                                                if ($org[$key] == false) {
+                                                                if ($org[$key] == false){
                                                                         $str.= "<td style='background-color: #f2dede;'>Tende a Não Possuir</td>";
                                                                         $pos['org']++;
                                                                 } else {
                                                                         $str.= "<td style='background-color: #dff0d8;'>Tende a Possuir</td>";
                                                                         $nPos['org']++;
-                                                                }
+                                                                        }
 
-                                                                if ($flu[$key] == false) {
+                                                                if ($flu[$key] == false){
                                                                         $str.= "<td style='background-color: #f2dede;'>Tende a Não Possuir</td>";
                                                                         $pos['flu']++;
-                                                                } else {
+                                                                } else
                                                                         $str.= "<td style='background-color: #dff0d8;'>Tende a Possuir</td>";
                                                                         $nPos['flu']++;
-                                                                }
+                                                                        }
 
-                                                                if ($auto[$key] == false) {
+                                                                if ($auto[$key] == false){
                                                                         $str.= "<td style='background-color: #f2dede;'>Tende a Não Possuir</td>";
                                                                         $pos['auto']++;
                                                                 } else {
                                                                         $str.= "<td style='background-color: #dff0d8;'>Tende a Possuir</td>";
                                                                         $nPos['auto']++;
-                                                                }
+                                                                        }
 
-                                                                if ($com[$key] == false) {
+                                                                if ($com[$key] == false){
                                                                         $str.= "<td style='background-color: #f2dede;'>Tende a Não Possuir</td>";
                                                                         $pos['com']++;
                                                                 } else {
                                                                         $str.= "<td style='background-color: #dff0d8;'>Tende a Possuir</td>";
                                                                         $nPos['com']++;
-                                                                }
+                                                                        }
 
-                                                                if ($virt[$key] == false) {
+                                                                if ($virt[$key] == false){
                                                                         $str.= "<td style='background-color: #f2dede;'>Tende a Não Possuir</td>";
                                                                         $pos['virt']++;
                                                                 } else {
                                                                         $str.= "<td style='background-color: #dff0d8;'>Tende a Possuir</td>";
                                                                         $nPos['virt']++;
-                                                                }
+                                                                        }
 
                                                                 $str.="</tr>";
                                                         }
                                                         echo $str;
                                                         ?>
                                                 </tbody>
-                                                <tfoot>
-                                                        <tr>
-                                                                <td>
-                                                                        Possuir / Não Possuir
-                                                                </td>
-                                                                <td>
-                                                                        <?= $pos['org']." / ".$nPos['org'] ?>
-                                                                </td>
-                                                                <td>
-                                                                        <?= $pos['flu']." / ".$nPos['flu'] ?>
-                                                                </td>
-                                                                <td>
-                                                                        <?= $pos['auto']." / ".$nPos['auto'] ?>
-                                                                </td>
-                                                                <td>
-                                                                        <?= $pos['com']." / ".$nPos['com'] ?>
-                                                                </td>
-                                                                <td>
-                                                                        <?= $pos['virt']." / ".$nPos['virt'] ?>
-                                                                </td>
-                                                        </tr>
-                                                </tfoot>
                                         </table>
                                 </div>
                         </div>
