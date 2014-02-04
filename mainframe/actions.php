@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . "/tcc/mainframe/autoload.php";
+require_once "autoload.php";
 
 @session_cache_expire(90); // 2 hours
 @session_start();
@@ -16,8 +16,7 @@ $get = $_GET;
  */
 
 //##################################
-$db = new data();
-$uti = new utils();
+$dbm = new datamining();
 //#################################
 
 if (isset($get['action'])) {
@@ -28,6 +27,8 @@ if (isset($get['action'])) {
 
 if (isset($post['action'])) {
         switch ($post['action']) {
-
+        	case "getForumCursos" : {
+        		echo $dbm->getSelectForum($post['curso']);
+        	} break;
         }
 };

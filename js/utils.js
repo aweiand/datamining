@@ -9,12 +9,12 @@ function _dir() {
         var urlExplode = url.split("/");
         var serverName = urlExplode[0];
 
-        serverName = 'http://' + serverName + '/';
+        serverName = 'http://' + serverName +_CFG + "/";
         return serverName;
 }
 
-var action = _dir() + "tcc/mainframe/actions.php";
-var loader = _dir() + "tcc/img/loader.gif";
+var action = _dir() + "mainframe/actions.php";
+var loader = _dir() + "img/loader.gif";
 
 // Limit scope pollution from any deprecated API
 (function() {
@@ -184,8 +184,18 @@ function shorTable(tbl) {
                 "bInfo": false,
                 "bAutoWidth": true,
                 "bJQueryUI": false,
+                "aLengthMenu": [
+                        [10, 100, 200, 300, -1],
+                        [10, 100, 200, 300, "Todos"]
+                ],
                 "oLanguage": {
                         "sUrl": "mainframe/plugins/jquery/DataTables-1.9.4/datatables.Portuguese.txt"
                 }
         });
 }      
+
+function loadForum(){
+        $("#selectForum").load(action, { "action" : "getForumCursos", "curso" : $("#selCurso :selected").val()}, function(){
+
+        })
+}

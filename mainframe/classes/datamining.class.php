@@ -334,4 +334,51 @@ class datamining extends utils {
                 return $alunos;
         }
 
+        function getSelectCurso($curso = null){
+            $html = "<label>Curso:
+                        <select name='curso' id='selCurso' onchange='loadForum()'> ";
+
+            $sql = "SELECT id, fullname FROM {$this->prefix}course ORDER BY fullname ASC ";
+            $rs = $this->db->query($sql);
+
+            while ($obj = $rs->FetchNextObject()) {
+                if ($curso != null && $curso == $obj->ID){
+                   $html.= "<option value='$obj->ID' selected='selected'>$obj->FULLNAME</option>";
+                } else {
+                    $html.= "<option value='$obj->ID'>$obj->FULLNAME</option>";
+                }
+            }
+
+            $html.= "</select>
+                    </label>";
+            return $html;
+        }
+
+        function getSelectForum($curso = null, $forum = null){
+            $html = "<div id='selectForum'>
+                        <label>Fórum
+                            <select name='forum' id='selForum'> ";
+
+            if ($curso != null){
+                $sql = "SELECT id, name FROM {$this->prefix}forum WHERE course = $curso ORDER BY name ASC ";
+
+                $rs = $this->db->query($sql);
+
+                while ($obj = $rs->FetchNextObject()) {
+                    if ($forum != null && $forum == $obj->ID){
+                       $html.= "<option value='$obj->ID' selected='selected'>$obj->NAME</option>";
+                    } else {
+                        $html.= "<option value='$obj->ID'>$obj->NAME</option>";
+                    }
+                }
+            } else {
+                $html.= "<option disable>Selecione um Curso</option>";
+            }
+
+            $html.= "       </select>
+                        </label>
+                    </div>";
+            return $html;
+        }
+
 }
