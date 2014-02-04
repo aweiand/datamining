@@ -16,18 +16,21 @@
  *  @copyright Augusto Weiand <guto.weiand@gmail.com>
  *
  */
+error_reporting(0);
+
 unset($CFG);
 GLOBAL $CFG;
 $CFG = new stdClass();
 
-$CFG->docs = $_SERVER['DOCUMENT_ROOT'] . "/tcc";
-$CFG->www = "http://" . $_SERVER['SERVER_NAME'] . "/tcc/";
+$CFG->affix = "/datamining";
+$CFG->docs = $_SERVER['DOCUMENT_ROOT'] . $CFG->affix;
+$CFG->www = "http://" . $_SERVER['SERVER_NAME'] . $CFG->affix ."/";
 $CFG->main = "$CFG->docs/mainframe/";
 
 require_once("$CFG->main/plugins/adodb/adodb.inc.php");
 
 function __autoload($classe) {
-        $path = ($_SERVER['DOCUMENT_ROOT'] . "/tcc/mainframe/classes/");
+        $path = ($_SERVER['DOCUMENT_ROOT'] . "/datamining/mainframe/classes/");
 
         if (file_exists($path . $classe . '.class.php')) {
                 require_once $path . $classe . '.class.php';

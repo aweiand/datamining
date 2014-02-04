@@ -2,8 +2,18 @@
 require_once "mainframe/autoload.php";
 @session_start();
 
-$curso = 128;
-$forum = 470;
+if (!isset($_GET['curso']) || !isset($_GET['forum'])){
+        echo "<h2>Falta algum destes parâmetros no link...</h2>";
+        echo "<pre>
+                \$_GET[\"course\"]
+                \$_GET[\"forum\"]
+                </pre>";
+        echo "<p><i>Exemplo:</i> index.php?curso=1&forum=2</p>";
+        exit;
+}
+
+$curso = $_GET['curso'];
+$forum = $_GET['forum'];
 
 $dbm = new datamining();
 //echo '<pre>';
@@ -55,8 +65,8 @@ $virt = $dbm->getPresencialidadeVirtual($curso, $forum);
                 <div class="row-fluid" style="background: url('/alo/img/fundo.png') repeat-x scroll center top #E8ECD8">
                         <div class="center">
                                 <div class="content span" style="display:block;">
-                                        <h5>Curso - <?= utf8_encode($dbm->getDadoCurso($curso)->Fields("fullname")) ?></h5>
-                                        <h5>Fórum - <?= utf8_encode($dbm->getDadoForum($forum)->Fields("name")) ?></h5>
+                                        <h5>Curso - <?= ($dbm->getDadoCurso($curso)->Fields("fullname")) ?></h5>
+                                        <h5>Fórum - <?= ($dbm->getDadoForum($forum)->Fields("name")) ?></h5>
                                         <h6>Total de Alunos - <?= count($alunos) ?> / Dia(s) de Fórum - <?= $dbm->getDiasForum($forum) ?></h6>
                                         <table class="table table-striped" id='tblData'>
                                                 <thead>

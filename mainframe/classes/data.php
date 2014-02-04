@@ -34,12 +34,13 @@ class data {
          * @return mixed - Conexao
          */
         function startDB() {
-                $server = "127.0.0.1";
-                $database = "moodle";
-                $user = "root";
-                $password = "root";
+            $server = "localhost";
+            //$server   = "postgresql02.facos.edu.br";            
+            $database = "facos10";
+            $user = "facos11";
+            $password = "Alf@j0r260";
 
-                $CONN = ADONewConnection('mysql');
+                $CONN = ADONewConnection('postgres');
                 $CONN->Connect($server, $user, $password, $database);
                 $CONN->Execute("SET NAMES utf-8;");
                 $CONN->debug = $this->debug;

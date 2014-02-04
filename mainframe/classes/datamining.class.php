@@ -18,7 +18,7 @@ class datamining extends utils {
          * @param String $db - nome da classe de banco de dados a ser instanciada
          * @param String $prefix - prefixo das tabelas do moodle
          */
-        function datamining($db = "data", $prefix = "moodle_") {
+        function datamining($db = "data", $prefix = "mdl_") {
                 $this->prefix = $prefix;
                 $this->db = new $db;
         }
@@ -61,7 +61,7 @@ class datamining extends utils {
                                 break; //segundo
                 }
 
-                return round((strtotime($data2) - strtotime($data1)) / $Q);
+                return round((@strtotime($data2) - @strtotime($data1)) / $Q);
         }
 
         /**
@@ -146,7 +146,7 @@ class datamining extends utils {
                                 if ($post->Fields("modif") < $forum->Fields("assesstimefinish") &&
                                         $post->Fields("modif") > $forum->Fields("assesstimestart")) {
                                         if ($this->dataDif(
-                                                        date("Y-m-d", $forum->Fields("assesstimefinish")), date("Y-m-d", $post->Fields("modif")), "d") < 4)
+                                                        @date("Y-m-d", $forum->Fields("assesstimefinish")), @date("Y-m-d", $post->Fields("modif")), "d") < 4)
                                                 $alunos[$post->Fields("userid")]++;
                                         else
                                                 $alunos[$post->Fields("userid")]--;
@@ -197,8 +197,8 @@ class datamining extends utils {
                 //DEBUG::
                 //echo date("Y-m-d", $forum->Fields("assesstimestart"))." ".date("Y-m-d", $forum->Fields("assesstimefinish"))."<br />";
                 
-                return $this->dataDif(date("Y-m-d", $forum->Fields("assesstimestart")),
-                                                        date("Y-m-d", $forum->Fields("assesstimefinish")), "d");
+                return $this->dataDif(@date("Y-m-d", $forum->Fields("assesstimestart")),
+                                                        @date("Y-m-d", $forum->Fields("assesstimefinish")), "d");
         }
 
         /**
@@ -295,7 +295,7 @@ class datamining extends utils {
                                                                         WHERE p.discussion = " . $discus->Fields("id") . "
                                                                                 GROUP BY p.userid");
                         while (!$rs->EOF) {
-                                $alunos[$rs->Fields("userid")] += $rs->Fields("count");
+                                @$alunos[$rs->Fields("userid")] += $rs->Fields("count");
                                 $rs->MoveNext();
                         }
                         $discus->MoveNext();
