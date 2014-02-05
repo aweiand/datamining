@@ -1,7 +1,7 @@
 <?php
 require_once "mainframe/autoload.php";
 @session_start();
-$dbm = new datamining();
+$dbm = new datamining(@$_GET['curso'], @$_GET['forum'], @$_GET['date']);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -29,7 +29,7 @@ $dbm = new datamining();
                 <!-- JS Struct -->
                 <?php echo "<script type='text/javascript'>
                                 var _CFG = '$CFG->affix';
-                        </script>"; 
+                            </script>"; 
                 ?>
                 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
                 <script type="text/javascript" src="mainframe/plugins/jquery/js/jquery-1.9.1.js"></script>
@@ -43,6 +43,10 @@ $dbm = new datamining();
                     google.load('visualization', '1', {packages: ['charteditor', 'corechart']});
 
                     var localGoogle = google;
+
+                    $(function(){
+                        $("#datafim, #dataini").datepicker({ dateFormat: "yy-mm-dd" });
+                    })
                 </script>
         </head>
         <body>
@@ -65,6 +69,17 @@ $dbm = new datamining();
                                                 <form action='./' method='GET'>
                                                         ". $dbm->getSelectCurso(@$_GET['curso']) ."
                                                         ". $dbm->getSelectForum(@$_GET['curso'], @$_GET['forum']) ."
+
+                                                        <fieldset>
+                                                            <legend>Período do Fórum (opcional)</legend>
+                                                            <label>
+                                                                Início <input type='text' name='date[ini]' id='dataini' maxlength='10' style='width: 75px;' value='".@$_GET['date']['ini']."' />
+                                                            </label>
+                                                            <label>
+                                                                Fim <input type='text' name='date[fim]' id='datafim' maxlength='10' style='width: 75px;' value='".@$_GET['date']['fim']."' />
+                                                            </label>
+                                                        </fieldset>
+
                                                         <button class='btn btn-info'>
                                                                 <i class='icon icon-ok'></i> Consultar
                                                         </button>
@@ -74,18 +89,15 @@ $dbm = new datamining();
                                 exit();
                         }
 
-                        $curso = $_GET['curso'];
-                        $forum = $_GET['forum'];
-
                         //echo '<pre>';
-                        //print_r($dbm->getProfessroesCurso($curso));                                                
-                        $alunos = $dbm->getAlunosCurso($curso);
-                        //print_r($dbm->getModId($curso, $forum));
-                        $org = $dbm->getOrganizacao($curso, $forum);
-                        $flu = $dbm->getFluenciaDigital($curso, $forum);
-                        $auto = $dbm->getAutonomia($curso, $forum);
-                        $com = $dbm->getComunicacao($curso, $forum);
-                        $virt = $dbm->getPresencialidadeVirtual($curso, $forum);
+                        //print_r($dbm->getProfessroesCurso($_GET['curso']));                                                
+                        $alunos = $dbm->getAlunosCurso($_GET['curso']);
+                        //print_r($dbm->getModId($_GET['curso'], $_GET['forum']));
+                        $org = $dbm->getOrganizacao($_GET['curso'], $_GET['forum']);
+                        $flu = $dbm->getFluenciaDigital($_GET['curso'], $_GET['forum']);
+                        $auto = $dbm->getAutonomia($_GET['curso'], $_GET['forum']);
+                        $com = $dbm->getComunicacao($_GET['curso'], $_GET['forum']);
+                        $virt = $dbm->getPresencialidadeVirtual($_GET['curso'], $_GET['forum']);
                 ?>
 
                 <div class="row-fluid" style="background: #E8ECD8">
@@ -96,6 +108,15 @@ $dbm = new datamining();
                                                 <?php
                                                         echo $dbm->getSelectCurso(@$_GET['curso']); 
                                                         echo $dbm->getSelectForum(@$_GET['curso'], @$_GET['forum']); 
+                                                        echo "  <fieldset>
+                                                                    <legend>Período do Fórum (opcional)</legend>
+                                                                    <label>
+                                                                        Início <input type='text' name='date[ini]' id='dataini' maxlength='10' style='width: 75px;' value='".@$_GET['date']['ini']."' />
+                                                                    </label>
+                                                                    <label>
+                                                                        Fim <input type='text' name='date[fim]' id='datafim' maxlength='10' style='width: 75px;' value='".@$_GET['date']['fim']."' />
+                                                                    </label>
+                                                                </fieldset>";
                                                         echo "  <button class='btn btn-info'>
                                                                         <i class='icon icon-ok'></i> Consultar
                                                                 </button>";
@@ -116,9 +137,9 @@ $dbm = new datamining();
                                         <hr />
                                 </fieldset>
                                 <div class="content span" style='display: block;'>
-                                        <h5>Curso - <?= ($dbm->getDadoCurso($curso)->Fields("fullname")) ?></h5>
-                                        <h5>Fórum - <?= ($dbm->getDadoForum($forum)->Fields("name")) ?></h5>
-                                        <h6>Total de Alunos - <?= count($alunos) ?> / Dia(s) de Fórum - <?= $dbm->getDiasForum($forum) ?></h6>
+                                        <h5>Curso - <?= ($dbm->getDadoCurso($_GET['curso'])->Fields("fullname")) ?></h5>
+                                        <h5>Fórum - <?= ($dbm->getDadoForum($_GET['forum'])->Fields("name")) ?></h5>
+                                        <h6>Total de Alunos - <?= count($alunos) ?> / Dia(s) de Fórum - <?= $dbm->getDiasForum($_GET['forum']) ?></h6>
                                 </div>
 
                                 <div class="content span" style='display: block;'>

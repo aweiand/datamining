@@ -12,15 +12,30 @@ class datamining extends utils {
 
         var $prefix;
         var $db;
+        var $curso;
+        var $forum;
+        var $dataini;
+        var $datafim;
 
         /**
          * Esta função construtora, define a classe que sera utilizada para os selects
          * @param String $db - nome da classe de banco de dados a ser instanciada
          * @param String $prefix - prefixo das tabelas do moodle
          */
-        function datamining($db = "data", $prefix = "mdl_") {
-                $this->prefix = $prefix;
-                $this->db = new $db;
+        function datamining($curso = null, $forum = null, $data = null, $db = "data", $prefix = "mdl_") {
+              $this->curso = $curso;
+              $this->forum = $forum;
+
+              if ($data != null && $data['ini'] != ""){
+                $this->dataini = @strtotime($data['ini']);
+                $this->datafim = @strtotime($data['fim']);
+              } else {
+                $this->dataini = null;
+                $this->datafim = null;
+              }
+
+              $this->prefix = $prefix;
+              $this->db = new $db;
         }
 
         /**
@@ -130,8 +145,15 @@ class datamining extends utils {
                 $forum = $this->db->query("SELECT * FROM " . $this->prefix . "forum
                                                                         WHERE id = $idforum");
 
-                if ($forum->Fields("assesstimestart") == 0 && $forum->Fields("assestimefinish") == 0)
-                        return "-1";
+                if ($this->dataini != null && $this->datafim != null){
+                  $assesstimestart = $this->dataini;
+                  $assesstimeend = $this->datafim;
+                } elseif ($forum->Fields("assesstimestart") == 0 && $forum->Fields("assestimefinish") == 0){
+                  return "-1"; 
+                } else {
+                  $assesstimestart = $forum->Fields("assesstimestart");
+                  $assesstimeend = $forum->Fields("assesstimefinish");
+                }
 
                 $discus = $this->db->query("SELECT * FROM " . $this->prefix . "forum_discussions
                                                                         WHERE forum = $idforum");
@@ -143,10 +165,10 @@ class datamining extends utils {
                                                                                 GROUP BY p.userid");
 
                         while (!$post->EOF) {
-                                if ($post->Fields("modif") < $forum->Fields("assesstimefinish") &&
-                                        $post->Fields("modif") > $forum->Fields("assesstimestart")) {
+                                if ($post->Fields("modif") < $assesstimeend &&
+                                        $post->Fields("modif") > $assesstimestart) {
                                         if ($this->dataDif(
-                                                        @date("Y-m-d", $forum->Fields("assesstimefinish")), @date("Y-m-d", $post->Fields("modif")), "d") < 4)
+                                                        @date("Y-m-d", $assesstimeend), @date("Y-m-d", $post->Fields("modif")), "d") < 4)
                                                 $alunos[$post->Fields("userid")]++;
                                         else
                                                 $alunos[$post->Fields("userid")]--;
@@ -197,8 +219,16 @@ class datamining extends utils {
                 //DEBUG::
                 //echo date("Y-m-d", $forum->Fields("assesstimestart"))." ".date("Y-m-d", $forum->Fields("assesstimefinish"))."<br />";
                 
-                return $this->dataDif(@date("Y-m-d", $forum->Fields("assesstimestart")),
-                                                        @date("Y-m-d", $forum->Fields("assesstimefinish")), "d");
+                if ($this->dataini != null && $this->datafim != null){
+                  $assesstimestart = $this->dataini;
+                  $assesstimeend = $this->datafim;
+                } else {
+                  $assesstimestart = $forum->Fields("assesstimestart");
+                  $assesstimeend = $forum->Fields("assesstimefinish");
+                }
+
+                return $this->dataDif(@date("Y-m-d", $assesstimestart),
+                                                        @date("Y-m-d", $assesstimeend), "d");
         }
 
         /**
