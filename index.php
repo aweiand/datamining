@@ -30,12 +30,20 @@ $dbm = new datamining();
                 <?php echo "<script type='text/javascript'>
                                 var _CFG = '$CFG->affix';
                         </script>"; 
-                ?>                
+                ?>
+                <script type="text/javascript" src="https://www.google.com/jsapi"></script>
                 <script type="text/javascript" src="mainframe/plugins/jquery/js/jquery-1.9.1.js"></script>
                 <script type="text/javascript" src="mainframe/plugins/jquery/js/jquery-ui-1.10.2.custom.min.js"></script>
                 <script type="text/javascript" src="mainframe/plugins/bootstrap/js/bootstrap.min.js"></script>
                 <script type="text/javascript" src="mainframe/plugins/jquery/DataTables-1.9.4/media/js/jquery.dataTables.min.js"></script>
                 <script type="text/javascript" src="js/utils.js"></script>
+
+                <script type="text/javascript">
+                    // Load the Visualization API and the piechart package.
+                    google.load('visualization', '1', {packages: ['charteditor', 'corechart']});
+
+                    var localGoogle = google;
+                </script>
         </head>
         <body>
                 <div class="center row-fluid">
@@ -80,7 +88,7 @@ $dbm = new datamining();
                         $virt = $dbm->getPresencialidadeVirtual($curso, $forum);
                 ?>
 
-                <div class="row-fluid" style="background: url('img/fundo.png') repeat-x scroll center top #E8ECD8">
+                <div class="row-fluid" style="background: #E8ECD8">
                         <div class="center">
                                 <fieldset class='center row-fluid' style='text-align: right;'>
                                         <legend>Dados</legend>
@@ -88,17 +96,38 @@ $dbm = new datamining();
                                                 <?php
                                                         echo $dbm->getSelectCurso(@$_GET['curso']); 
                                                         echo $dbm->getSelectForum(@$_GET['curso'], @$_GET['forum']); 
+                                                        echo "  <button class='btn btn-info'>
+                                                                        <i class='icon icon-ok'></i> Consultar
+                                                                </button>";
+
+                                                        if (isset($_GET['curso']) && isset($_GET['forum'])){
+                                                                echo "  <p style='line-height: 3;'>
+                                                                                <button type='button' class='btn btn-small btn-primary' onclick=\"$('#tblResults').toggle('slow'); return false;\">
+                                                                                        <i class='icon icon-resize-full'></i> Expandir Resultados
+                                                                                </button>
+
+                                                                                <button type='button' class='btn btn-small' onclick='openEditor()'>
+                                                                                        <i class='icon icon-edit'></i> Editor de Gráfico
+                                                                                </button>
+                                                                        </p>";
+                                                        }
                                                 ?>
-                                                <button class='btn btn-info'>
-                                                        <i class='icon icon-ok'></i> Consultar
-                                                </button>
                                         </form>
                                         <hr />
                                 </fieldset>
-                                <div class="content span" style="display:block;">
+                                <div class="content span" style='display: block;'>
                                         <h5>Curso - <?= ($dbm->getDadoCurso($curso)->Fields("fullname")) ?></h5>
                                         <h5>Fórum - <?= ($dbm->getDadoForum($forum)->Fields("name")) ?></h5>
                                         <h6>Total de Alunos - <?= count($alunos) ?> / Dia(s) de Fórum - <?= $dbm->getDiasForum($forum) ?></h6>
+                                </div>
+
+                                <div class="content span" style='display: block;'>
+                                        <h4>Gráficos</h4>
+                                        <div id="_relGraph"></div>
+                                </div>
+                                
+                                <div class="content span" id='tblResults' style='display: none;'>
+                                        <h4>Dados</h4>
                                         <table class="table table-striped" id='tblData'>
                                                 <thead>
                                                         <tr>
@@ -216,8 +245,44 @@ $dbm = new datamining();
                         </div>
                 </div>
 
-                <script>
-                        shorTable("#tblData");
+                <script type='text/javascript'>
+                        var wrapper;
+
+                        function drawVisualization() {
+                          wrapper = new google.visualization.ChartWrapper({
+                          chartType: 'ColumnChart',
+                          dataTable: [ ['Competência', 'Tendem a Ter', 'Tendem a Não Ter'],
+                                       ['Organização', <?= $pos['org'] ?>, <?= $nPos['org'] ?>],
+                                       ['Fluência Digital', <?= $pos['flu'] ?>, <?= $nPos['flu'] ?>],
+                                       ['Autonomia', <?= $pos['auto'] ?>, <?= $nPos['auto'] ?>],
+                                       ['Comunicação', <?= $pos['com'] ?>, <?= $nPos['com'] ?>],
+                                       ['Presencialidade Virtual', <?= $pos['virt'] ?>, <?= $nPos['virt'] ?>]
+                                     ],
+                            options: {
+                              'title': 'Tendência dos alunos no Fórum/Curso Analizado',
+                              backgroundColor: { fill:'transparent' },
+                              hAxis: {title: "Competências"}
+                            },
+                          containerId: '_relGraph'
+                        });
+                        wrapper.draw();
+                        }
+
+                        function openEditor() {
+                          var editor = new localGoogle.visualization.ChartEditor();
+                          localGoogle.visualization.events.addListener(editor, 'ok',
+                            function() {
+                              wrapper = editor.getChartWrapper();
+                              wrapper.draw(document.getElementById('_relGraph'));
+                          });
+                          editor.openDialog(wrapper);
+                        }                    
+                
+                        $(function(){
+                                shorTable("#tblData");
+
+                                drawVisualization();
+                        })
                 </script>
 
         </body>
